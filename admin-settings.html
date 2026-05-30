@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Everbuy</title>
+    <script>
+        (function() {
+            const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            if (!adminLoggedIn) {
+                window.location.href = 'admin-login.html';
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e62e5c;
+            --primary-light: #ff6b8a;
+            --dark: #1a1a2e;
+            --dark-light: #2a2a40;
+            --gray-bg: #f5f5f9;
+            --gray-light: #e8e8ec;
+            --text: #282c3f;
+            --text-light: #7e808c;
+            --white: #ffffff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-bg);
+            color: var(--text);
+        }
+
+        /* Admin Header */
+        .admin-header {
+            background: var(--dark);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-logo {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-logo span {
+            color: var(--primary);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+        }
+
+        /* Admin Container */
+        .admin-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            background: var(--white);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(255, 63, 108, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar-menu li a i {
+            width: 20px;
+            font-size: 16px;
+        }
+
+        /* Admin Content */
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            overflow-x: auto;
+            max-width: 1200px;
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .content-header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Settings Sections */
+        .settings-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .settings-header i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .settings-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 63, 108, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .danger-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .danger-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .warning-box p {
+            font-size: 13px;
+            color: #ef6c00;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .sidebar-menu li {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 15px 20px;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .settings-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="admin-logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>EVERBUY</span> Admin
+        </div>
+        <div class="admin-user">
+            <div class="admin-avatar">A</div>
+            <span>Welcome, Admin</span>
+            <a href="admin-login.html" class="logout-btn" onclick="sessionStorage.removeItem('adminLoggedIn')">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="admin-products.html"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="admin-orders.html"><i class="fas fa-truck"></i> Orders</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-coupons.html"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
+                <li><a href="admin-flashsale.html"><i class="fas fa-fire"></i> Flash Sale</a></li>
+                <li><a href="admin-giftcards.html"><i class="fas fa-gift"></i> Gift Cards</a></li>
+                <li><a href="admin-reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </div>
+
+        <div class="admin-content">
+            <div class="content-header">
+                <h1><i class="fas fa-cog"></i> Site Settings</h1>
+                <p>Configure your store settings and preferences</p>
+            </div>
+
+            <!-- General Settings -->
+            <div class="settings-section">
+                <div class="settings-header">
+                    <i class="fas fa-store"></i>
+                    <h2>General Settings</h2>
+                </div>
+                <div class="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Store Name</label>
+                            <input type="text" id="storeName" placeholder="Everbuy - Your Everyday Store">
+                        </div>
+                        <div class="form-group">
+                            <label>Store Email</label>
+                            <input type="email" id="storeEmail" placeholder="care@everbuy.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="storePhone" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" id="storeAddress" placeholder="Unifonect Solutions, Cyber City, Gurugram">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Store Description</label>
+                        <textarea id="storeDescription" rows="3" placeholder="Your Everyday Store - Bringing fashion to your doorstep"></textarea>
+                    </div>
+                    <button class="save-btn" onclick="saveGeneralSettings()">
+                        <i class="fas fa-save"></i> Save General Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shipping Settings -->
+            <div class="settings-section">
+                <div class="settings-header">
+                    <i class="fas fa-truck"></i>
+                    <h2>Shipping Settings</h2>
+                </div>
+                <div class="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Free Shipping Threshold (₹)</label>
+                            <input type="number" id="freeShippingThreshold" placeholder="1999">
+                        </div>
+                        <div class="form-group">
+                            <label>Standard Shipping Charges (₹)</label>
+                            <input type="number" id="standardShipping" placeholder="199">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Express Shipping Charges (₹)</label>
+                            <input type="number" id="expressShipping" placeholder="399">
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Delivery Days</label>
+                            <input type="text" id="deliveryDays" placeholder="3-5 business days">
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="saveShippingSettings()">
+                        <i class="fas fa-save"></i> Save Shipping Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Settings -->
+            <div class="settings-section">
+                <div class="settings-header">
+                    <i class="fas fa-credit-card"></i>
+                    <h2>Payment Settings</h2>
+                </div>
+                <div class="settings-form">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableCOD" checked>
+                        <label>Enable Cash on Delivery (COD)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableCard" checked>
+                        <label>Enable Credit/Debit Cards</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableUPI" checked>
+                        <label>Enable UPI (Google Pay, PhonePe, Paytm)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableNetbanking" checked>
+                        <label>Enable Net Banking</label>
+                    </div>
+                    <button class="save-btn" onclick="savePaymentSettings()">
+                        <i class="fas fa-save"></i> Save Payment Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <div class="settings-header">
+                    <i class="fas fa-bell"></i>
+                    <h2>Notification Settings</h2>
+                </div>
+                <div class="settings-form">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifyOrderPlaced" checked>
+                        <label>Send email when order is placed</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifyOrderShipped" checked>
+                        <label>Send email when order is shipped</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifyOrderDelivered" checked>
+                        <label>Send email when order is delivered</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifyNewUser" checked>
+                        <label>Send welcome email to new users</label>
+                    </div>
+                    <button class="save-btn" onclick="saveNotificationSettings()">
+                        <i class="fas fa-save"></i> Save Notification Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-section">
+                <div class="settings-header">
+                    <i class="fas fa-database"></i>
+                    <h2>Data Management</h2>
+                </div>
+                <div class="warning-box">
+                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> These actions are irreversible. Please be careful!</p>
+                </div>
+                <div class="form-row">
+                    <button class="danger-btn" onclick="clearAllData()">
+                        <i class="fas fa-trash-alt"></i> Clear All Data
+                    </button>
+                    <button class="danger-btn" onclick="resetDemoData()">
+                        <i class="fas fa-undo-alt"></i> Reset to Demo Data
+                    </button>
+                    <button class="save-btn" onclick="exportAllData()">
+                        <i class="fas fa-download"></i> Export All Data (Backup)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('everbuy_settings') || '{}');
+            
+            // General Settings
+            document.getElementById('storeName').value = settings.storeName || 'Everbuy - Your Everyday Store';
+            document.getElementById('storeEmail').value = settings.storeEmail || 'care@everbuy.com';
+            document.getElementById('storePhone').value = settings.storePhone || '+91 98765 43210';
+            document.getElementById('storeAddress').value = settings.storeAddress || 'Unifonect Solutions, Cyber City, Gurugram';
+            document.getElementById('storeDescription').value = settings.storeDescription || 'Your Everyday Store - Bringing fashion to your doorstep';
+            
+            // Shipping Settings
+            document.getElementById('freeShippingThreshold').value = settings.freeShippingThreshold || '1999';
+            document.getElementById('standardShipping').value = settings.standardShipping || '199';
+            document.getElementById('expressShipping').value = settings.expressShipping || '399';
+            document.getElementById('deliveryDays').value = settings.deliveryDays || '3-5 business days';
+            
+            // Payment Settings
+            document.getElementById('enableCOD').checked = settings.enableCOD !== false;
+            document.getElementById('enableCard').checked = settings.enableCard !== false;
+            document.getElementById('enableUPI').checked = settings.enableUPI !== false;
+            document.getElementById('enableNetbanking').checked = settings.enableNetbanking !== false;
+            
+            // Notification Settings
+            document.getElementById('notifyOrderPlaced').checked = settings.notifyOrderPlaced !== false;
+            document.getElementById('notifyOrderShipped').checked = settings.notifyOrderShipped !== false;
+            document.getElementById('notifyOrderDelivered').checked = settings.notifyOrderDelivered !== false;
+            document.getElementById('notifyNewUser').checked = settings.notifyNewUser !== false;
+        }
+
+        function saveGeneralSettings() {
+            const settings = JSON.parse(localStorage.getItem('everbuy_settings') || '{}');
+            settings.storeName = document.getElementById('storeName').value;
+            settings.storeEmail = document.getElementById('storeEmail').value;
+            settings.storePhone = document.getElementById('storePhone').value;
+            settings.storeAddress = document.getElementById('storeAddress').value;
+            settings.storeDescription = document.getElementById('storeDescription').value;
+            localStorage.setItem('everbuy_settings', JSON.stringify(settings));
+            showToast('General settings saved successfully!');
+        }
+
+        function saveShippingSettings() {
+            const settings = JSON.parse(localStorage.getItem('everbuy_settings') || '{}');
+            settings.freeShippingThreshold = parseInt(document.getElementById('freeShippingThreshold').value);
+            settings.standardShipping = parseInt(document.getElementById('standardShipping').value);
+            settings.expressShipping = parseInt(document.getElementById('expressShipping').value);
+            settings.deliveryDays = document.getElementById('deliveryDays').value;
+            localStorage.setItem('everbuy_settings', JSON.stringify(settings));
+            showToast('Shipping settings saved successfully!');
+        }
+
+        function savePaymentSettings() {
+            const settings = JSON.parse(localStorage.getItem('everbuy_settings') || '{}');
+            settings.enableCOD = document.getElementById('enableCOD').checked;
+            settings.enableCard = document.getElementById('enableCard').checked;
+            settings.enableUPI = document.getElementById('enableUPI').checked;
+            settings.enableNetbanking = document.getElementById('enableNetbanking').checked;
+            localStorage.setItem('everbuy_settings', JSON.stringify(settings));
+            showToast('Payment settings saved successfully!');
+        }
+
+        function saveNotificationSettings() {
+            const settings = JSON.parse(localStorage.getItem('everbuy_settings') || '{}');
+            settings.notifyOrderPlaced = document.getElementById('notifyOrderPlaced').checked;
+            settings.notifyOrderShipped = document.getElementById('notifyOrderShipped').checked;
+            settings.notifyOrderDelivered = document.getElementById('notifyOrderDelivered').checked;
+            settings.notifyNewUser = document.getElementById('notifyNewUser').checked;
+            localStorage.setItem('everbuy_settings', JSON.stringify(settings));
+            showToast('Notification settings saved successfully!');
+        }
+
+        function showToast(message, isError = false) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = message;
+            toast.style.background = isError ? '#dc3545' : '#1a1a1a';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ WARNING: This will delete ALL data (users, orders, products, reviews, gift cards, coupons). This cannot be undone. Are you sure?')) {
+                // Clear all app data but keep admin session
+                const keysToKeep = ['everbuy_settings', 'flash_sale_end', 'flash_sale_products'];
+                const allKeys = Object.keys(localStorage);
+                allKeys.forEach(key => {
+                    if (!keysToKeep.includes(key)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                showToast('All data cleared successfully! Page will reload.');
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }
+        }
+
+        function resetDemoData() {
+            if (confirm('Reset to demo data? This will restore sample products, users, and orders.')) {
+                // Reset users
+                const defaultUsers = [
+                    { id: 1, name: "Admin User", email: "admin@everbuy.com", password: "admin123", mobile: "9876543210", isAdmin: true, blocked: false, createdAt: new Date().toISOString() },
+                    { id: 2, name: "Demo User", email: "demo@everbuy.com", password: "demo123", mobile: "9876543211", isAdmin: false, blocked: false, createdAt: new Date().toISOString() }
+                ];
+                localStorage.setItem('everbuy_users', JSON.stringify(defaultUsers));
+                
+                // Reset products
+                const defaultProducts = [
+                    { id: 1, name: "Cotton Relaxed T-Shirt", brand: "H&M", price: 1299, original: 2499, category: "men", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100", stock: 45, sizes: ["S","M","L","XL"] },
+                    { id: 2, name: "Slim Fit Denim Jeans", brand: "Levi's", price: 2299, original: 3999, category: "men", image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=100", stock: 30, sizes: ["30","32","34","36"] },
+                    { id: 3, name: "Floral Maxi Dress", brand: "Zara", price: 3499, original: 5999, category: "women", image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=100", stock: 15, sizes: ["XS","S","M","L"] }
+                ];
+                localStorage.setItem('everbuy_products', JSON.stringify(defaultProducts));
+                
+                // Reset coupons
+                const today = new Date();
+                const nextYear = new Date();
+                nextYear.setFullYear(nextYear.getFullYear() + 1);
+                const defaultCoupons = [
+                    { code: "SAVE20", discountType: "percentage", discountValue: 20, minOrder: 1000, validFrom: today.toISOString().split('T')[0], validUntil: nextYear.toISOString().split('T')[0], usageLimit: null, usedCount: 0 },
+                    { code: "WELCOME100", discountType: "fixed", discountValue: 100, minOrder: 500, validFrom: today.toISOString().split('T')[0], validUntil: nextYear.toISOString().split('T')[0], usageLimit: 500, usedCount: 0 }
+                ];
+                localStorage.setItem('everbuy_admin_coupons', JSON.stringify(defaultCoupons));
+                
+                showToast('Demo data restored successfully! Page will reload.');
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }
+        }
+
+        function exportAllData() {
+            const exportData = {
+                settings: JSON.parse(localStorage.getItem('everbuy_settings') || '{}'),
+                users: JSON.parse(localStorage.getItem('everbuy_users') || '[]'),
+                products: JSON.parse(localStorage.getItem('everbuy_products') || '[]'),
+                orders: JSON.parse(localStorage.getItem('everbuy_orders') || '[]'),
+                coupons: JSON.parse(localStorage.getItem('everbuy_admin_coupons') || '[]'),
+                giftcards: JSON.parse(localStorage.getItem('everbuy_giftcards') || '[]'),
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `everbuy_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data exported successfully!');
+        }
+
+        // Initialize
+        loadSettings();
+    </script>
+</body>
+</html>

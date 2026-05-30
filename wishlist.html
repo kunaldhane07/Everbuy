@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>My Wishlist - Everbuy</title>
+    <script>
+        (function() {
+            const splashSeen = sessionStorage.getItem('splashSeen');
+            if (!splashSeen) {
+                const currentUrl = window.location.pathname.split('/').pop() || 'index.html';
+                localStorage.setItem('intendedUrl', currentUrl);
+                window.location.href = 'splash.html';
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e62e5c;
+            --primary-light: #ff6b8a;
+            --dark: #0c0c0c;
+            --gray-bg: #f5f5f9;
+            --gray-light: #e8e8ec;
+            --text: #282c3f;
+            --text-light: #7e808c;
+            --white: #ffffff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+        
+        /* FORCE DESKTOP VIEW ON ALL DEVICES */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--gray-bg); 
+            color: var(--text);
+            min-width: 1200px;
+            overflow-x: auto;
+        }
+        .top-bar { 
+            background: var(--dark); 
+            color: white; 
+            text-align: center; 
+            padding: 10px; 
+            font-size: 12px; 
+            font-weight: 500;
+            min-width: 1200px;
+        }
+        .header { 
+            background: var(--white); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: var(--shadow);
+            min-width: 1200px;
+        }
+        .header-container { 
+            width: 1200px; 
+            margin: 0 auto; 
+            padding: 0;
+        }
+        .header-main { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            height: 70px;
+            flex-wrap: nowrap;
+        }
+        .logo { text-decoration: none; cursor: pointer; }
+        .logo h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2px; }
+        .logo p { font-size: 10px; color: var(--text-light); letter-spacing: 1px; margin-top: 0; }
+        .search-wrapper { flex: 1; max-width: 500px; margin: 0 40px; }
+        .search-box { display: flex; align-items: center; background: var(--gray-bg); border-radius: 8px; padding: 10px 16px; border: 1px solid transparent; transition: var(--transition); }
+        .search-box:focus-within { background: var(--white); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,63,108,0.1); }
+        .search-box i { color: var(--text-light); }
+        .search-box input { flex: 1; border: none; background: none; padding: 0 12px; font-size: 14px; outline: none; font-family: inherit; }
+        .header-actions { display: flex; gap: 28px; align-items: center; }
+        .action-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--text); transition: var(--transition); position: relative; cursor: pointer; }
+        .action-item:hover { color: var(--primary); }
+        .action-item i { font-size: 22px; }
+        .action-item span { font-size: 11px; font-weight: 500; }
+        .cart-count { position: absolute; top: -8px; right: -12px; background: var(--primary); color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px; min-width: 18px; text-align: center; }
+        
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: var(--white);
+            min-width: 220px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 12px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .dropdown-content a:hover {
+            background: var(--gray-bg);
+            color: var(--primary);
+        }
+        .dropdown-content hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid var(--gray-light);
+        }
+        
+        /* Category Navigation */
+        .category-nav {
+            background: var(--white);
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+            min-width: 1200px;
+        }
+        .category-menu {
+            width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            gap: 32px;
+        }
+        .category-link {
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .category-link:hover {
+            color: var(--primary);
+        }
+        
+        /* WISHLIST PAGE - FIXED DESKTOP */
+        .wishlist-container { 
+            width: 1200px; 
+            margin: 40px auto; 
+            padding: 0;
+        }
+        .wishlist-header { margin-bottom: 30px; }
+        .wishlist-header h1 { font-size: 28px; font-weight: 700; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .product-card { background: var(--white); border-radius: 12px; overflow: hidden; transition: var(--transition); position: relative; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .product-image { position: relative; background: var(--gray-bg); overflow: hidden; }
+        .product-image img { width: 100%; height: 300px; object-fit: cover; transition: transform 0.3s; }
+        .product-card:hover .product-image img { transform: scale(1.05); }
+        .remove-wishlist { position: absolute; top: 12px; right: 12px; background: var(--white); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); transition: var(--transition); z-index: 2; }
+        .remove-wishlist:hover { background: var(--primary); color: white; }
+        .product-info { padding: 16px; }
+        .product-brand { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .product-name { font-size: 13px; color: var(--text-light); margin-bottom: 8px; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+        .move-to-cart { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .move-to-cart:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        
+        .empty-wishlist { text-align: center; padding: 80px; background: var(--white); border-radius: 16px; width: 1200px; margin: 0 auto; }
+        .empty-wishlist i { font-size: 80px; color: var(--gray-light); margin-bottom: 20px; }
+        .shop-now-btn { display: inline-block; background: var(--primary); color: white; padding: 12px 32px; border-radius: 10px; text-decoration: none; margin-top: 20px; font-weight: 600; transition: var(--transition); }
+        .shop-now-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        
+        /* FOOTER - SAME AS INDEX.HTML */
+        .footer { background: #1a1a2e; color: white; margin-top: 60px; padding: 50px 0 30px; min-width: 1200px; }
+        .footer-container { width: 1200px; margin: 0 auto; padding: 0; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-bottom: 48px; }
+        .footer-links-group h4 { font-size: 14px; margin-bottom: 20px; letter-spacing: 1px; color: var(--primary); }
+        .footer-links-group ul { list-style: none; }
+        .footer-links-group ul li { margin-bottom: 12px; }
+        .footer-links-group ul li a { color: #aaa; text-decoration: none; font-size: 13px; transition: var(--transition); }
+        .footer-links-group ul li a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid #2a2a40; color: #aaa; font-size: 12px; }
+        .footer-bottom strong { color: var(--primary); }
+        
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; color: white; padding: 14px 24px; border-radius: 12px; z-index: 2000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* NO MEDIA QUERIES - SAME DESKTOP VIEW ON ALL DEVICES */
+    </style>
+</head>
+<body>
+    <div class="top-bar">🚚 FREE SHIPPING ON ₹1999+ • 15 DAYS EASY RETURNS • 100% SECURE PAYMENTS</div>
+
+    <div class="header">
+        <div class="header-container">
+            <div class="header-main">
+                <a href="splash.html" class="logo">
+                    <h1>EVERBUY</h1>
+                    <p>Your Everyday Store</p>
+                </a>
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search for products, brands...">
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="dropdown">
+                        <div class="action-item" style="cursor: pointer;">
+                            <i class="far fa-user"></i>
+                            <span id="accountText">Account</span>
+                        </div>
+                        <div class="dropdown-content" id="accountDropdown">
+                            <a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                            <a href="orders.html"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="wishlist.html"><i class="far fa-heart"></i> Wishlist</a>
+                            <a href="cart.html"><i class="fas fa-bag-shopping"></i> Shopping Bag</a>
+                            <a href="addresses.html"><i class="fas fa-map-marker-alt"></i> Saved Addresses</a>
+                            <a href="payments.html"><i class="fas fa-credit-card"></i> Payment Methods</a>
+                            <a href="recently-viewed.html"><i class="fas fa-clock"></i> Recently Viewed</a>
+                            <hr>
+                            <a href="gift-cards.html"><i class="fas fa-gift"></i> Gift Cards</a>
+                            <a href="refer-earn.html"><i class="fas fa-users"></i> Refer & Earn</a>
+                            <hr>
+                            <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Login / Sign Up</a>
+                        </div>
+                    </div>
+                    <a href="wishlist.html" class="action-item">
+                        <i class="far fa-heart"></i>
+                        <span>Wishlist</span>
+                        <span id="wishlistCount" class="cart-count" style="display: none;">0</span>
+                    </a>
+                    <a href="cart.html" class="action-item">
+                        <i class="fas fa-bag-shopping"></i>
+                        <span>Bag</span>
+                        <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-nav">
+        <div class="category-menu">
+            <a href="products.html" class="category-link">ALL</a>
+            <a href="products.html?category=men" class="category-link">MEN</a>
+            <a href="products.html?category=women" class="category-link">WOMEN</a>
+            <a href="products.html?category=kids" class="category-link">KIDS</a>
+            <a href="products.html?category=ethnic" class="category-link">ETHNIC</a>
+            <a href="products.html?category=sports" class="category-link">SPORTS</a>
+            <a href="products.html?category=accessories" class="category-link">ACCESSORIES</a>
+            <a href="flash-sale.html" class="category-link" style="color: var(--primary);">SALE 🔥</a>
+            <a href="new-arrivals.html" class="category-link">NEW</a>
+            <a href="best-sellers.html" class="category-link">BESTSELLERS</a>
+        </div>
+    </div>
+
+    <div class="wishlist-container">
+        <div class="wishlist-header"><h1>My Wishlist</h1></div>
+        <div id="wishlistGrid"></div>
+    </div>
+
+    <!-- FOOTER - SAME AS INDEX.HTML -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-links-group">
+                    <h4>SHOP</h4>
+                    <ul>
+                        <li><a href="products.html">All Products</a></li>
+                        <li><a href="new-arrivals.html">New Arrivals</a></li>
+                        <li><a href="best-sellers.html">Best Sellers</a></li>
+                        <li><a href="flash-sale.html">Flash Sale</a></li>
+                        <li><a href="coupons.html">Coupons & Offers</a></li>
+                        <li><a href="size-guide.html">Size Guide</a></li>
+                        <li><a href="product-compare.html">Compare Products</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>ABOUT</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="returns.html">Return Policy</a></li>
+                        <li><a href="shipping.html">Shipping Info</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>OFFERS</h4>
+                    <ul>
+                        <li><a href="gift-cards.html">Gift Cards</a></li>
+                        <li><a href="refer-earn.html">Refer & Earn</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>CONTACT</h4>
+                    <ul>
+                        <li><a href="tel:+919876543210">📞 +91 98765 43210</a></li>
+                        <li><a href="mailto:care@everbuy.com">✉️ care@everbuy.com</a></li>
+                        <li><a href="contact.html">💬 24/7 Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 EVERBUY - A <strong>Unifonect Solutions</strong> Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const user = localStorage.getItem('everbuy_user');
+            if (!user) { window.location.href = 'login.html'; return; }
+        })();
+
+        function checkLogin() {
+            const user = localStorage.getItem('everbuy_user');
+            if (!user) return false;
+            return JSON.parse(user);
+        }
+
+        function updateAccountDropdown() {
+            const user = localStorage.getItem('everbuy_user');
+            const accountText = document.getElementById('accountText');
+            const logoutLink = document.getElementById('logoutLink');
+            if (user) {
+                const userData = JSON.parse(user);
+                if (accountText) accountText.innerText = `Hi, ${userData.name.split(' ')[0]}`;
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    logoutLink.href = '#';
+                    logoutLink.onclick = function(e) {
+                        e.preventDefault();
+                        localStorage.removeItem('everbuy_user');
+                        window.location.href = 'index.html';
+                    };
+                }
+            } else {
+                if (accountText) accountText.innerText = 'Account';
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Login / Sign Up';
+                    logoutLink.href = 'login.html';
+                    logoutLink.onclick = null;
+                }
+            }
+        }
+
+        const productsDB = [
+            { id:1, name:"Cotton Relaxed T-Shirt", brand:"H&M", price:1299, image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
+            { id:2, name:"Slim Fit Denim Jeans", brand:"Levi's", price:2299, image:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400" },
+            { id:3, name:"Floral Maxi Dress", brand:"Zara", price:3499, image:"https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400" },
+            { id:4, name:"Oversized Hoodie", brand:"Nike", price:2999, image:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400" },
+            { id:5, name:"Leather Biker Jacket", brand:"Zara", price:7999, image:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400" }
+        ];
+        
+        function getWishlist() { return JSON.parse(localStorage.getItem('everbuy_wishlist') || '[]'); }
+        function saveWishlist(wishlist) { localStorage.setItem('everbuy_wishlist', JSON.stringify(wishlist)); updateWishlistCount(); }
+        function getCart() { return JSON.parse(localStorage.getItem('everbuy_cart') || '[]'); }
+        function saveCart(cart) { localStorage.setItem('everbuy_cart', JSON.stringify(cart)); updateCartCount(); }
+        
+        function updateCartCount() { 
+            const cart = getCart(); 
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0); 
+            const badge = document.getElementById('cartCount'); 
+            if (badge) badge.textContent = count; 
+        }
+        
+        function updateWishlistCount() { 
+            const wishlist = getWishlist(); 
+            const count = wishlist.length; 
+            const badge = document.getElementById('wishlistCount'); 
+            if (badge) { 
+                badge.textContent = count; 
+                badge.style.display = count > 0 ? 'inline-block' : 'none'; 
+            } 
+        }
+        
+        function showToast(message) { 
+            const existing = document.querySelector('.toast'); 
+            if (existing) existing.remove(); 
+            const toast = document.createElement('div'); 
+            toast.className = 'toast'; 
+            toast.innerHTML = message; 
+            document.body.appendChild(toast); 
+            setTimeout(() => toast.remove(), 2500); 
+        }
+        
+        function renderWishlist() {
+            const wishlistIds = getWishlist();
+            const wishlistProducts = productsDB.filter(p => wishlistIds.includes(p.id));
+            const container = document.getElementById('wishlistGrid');
+            if (wishlistProducts.length === 0) { 
+                container.innerHTML = `<div class="empty-wishlist"><i class="far fa-heart"></i><h3>Your wishlist is empty</h3><p>Save your favorite items here</p><a href="products.html" class="shop-now-btn">Explore Products →</a></div>`; 
+                return; 
+            }
+            container.innerHTML = `<div class="product-grid">${wishlistProducts.map(p => `<div class="product-card"><div class="product-image"><img src="${p.image}" alt="${p.name}"><div class="remove-wishlist" onclick="removeFromWishlist(${p.id})"><i class="fas fa-times"></i></div></div><div class="product-info"><div class="product-brand">${p.brand}</div><div class="product-name">${p.name}</div><div class="product-price">₹${p.price}</div><button class="move-to-cart" onclick="moveToCart(${p.id})">Move to Bag</button></div></div>`).join('')}</div>`;
+        }
+        
+        function removeFromWishlist(id) { 
+            let wishlist = getWishlist(); 
+            wishlist = wishlist.filter(i => i !== id); 
+            saveWishlist(wishlist); 
+            renderWishlist(); 
+            showToast('Removed from wishlist'); 
+        }
+        
+        function moveToCart(id) { 
+            const user = checkLogin();
+            if (!user) { window.location.href = 'login.html'; return; }
+            const product = productsDB.find(p => p.id === id); 
+            let cart = getCart(); 
+            const existing = cart.find(item => item.id === id); 
+            if (existing) existing.quantity += 1; 
+            else cart.push({ id: product.id, name: product.name, brand: product.brand, price: product.price, image: product.image, quantity: 1 }); 
+            saveCart(cart); 
+            removeFromWishlist(id); 
+            showToast(`✓ ${product.name} added to bag`); 
+        }
+        
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) { 
+            if (e.key === 'Enter') {
+                const user = checkLogin();
+                if (user) window.location.href = `products.html?search=${encodeURIComponent(this.value)}`;
+                else window.location.href = 'login.html';
+            }
+        });
+        
+        renderWishlist(); 
+        updateCartCount(); 
+        updateWishlistCount(); 
+        updateAccountDropdown();
+    </script>
+</body>
+</html>

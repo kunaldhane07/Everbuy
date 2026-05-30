@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Checkout - Everbuy</title>
+    <script>
+        (function() {
+            const splashSeen = sessionStorage.getItem('splashSeen');
+            if (!splashSeen) {
+                const currentUrl = window.location.pathname.split('/').pop() || 'index.html';
+                localStorage.setItem('intendedUrl', currentUrl);
+                window.location.href = 'splash.html';
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e62e5c;
+            --primary-light: #ff6b8a;
+            --dark: #0c0c0c;
+            --gray-bg: #f5f5f9;
+            --gray-light: #e8e8ec;
+            --text: #282c3f;
+            --text-light: #7e808c;
+            --white: #ffffff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+        
+        /* FORCE DESKTOP VIEW ON ALL DEVICES */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--gray-bg); 
+            color: var(--text);
+            min-width: 1200px;
+            overflow-x: auto;
+        }
+        .top-bar { 
+            background: var(--dark); 
+            color: white; 
+            text-align: center; 
+            padding: 10px; 
+            font-size: 12px; 
+            font-weight: 500;
+            min-width: 1200px;
+        }
+        .header { 
+            background: var(--white); 
+            box-shadow: var(--shadow);
+            min-width: 1200px;
+        }
+        .header-container { 
+            width: 1200px; 
+            margin: 0 auto; 
+            padding: 0;
+        }
+        .header-main { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            height: 70px;
+            flex-wrap: nowrap;
+        }
+        .logo { text-decoration: none; cursor: pointer; }
+        .logo h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2px; }
+        .logo p { font-size: 10px; color: var(--text-light); letter-spacing: 1px; margin-top: 0; }
+        .header-actions { display: flex; gap: 28px; align-items: center; }
+        .action-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--text); transition: var(--transition); position: relative; cursor: pointer; }
+        .action-item:hover { color: var(--primary); }
+        .action-item i { font-size: 22px; }
+        .action-item span { font-size: 11px; font-weight: 500; }
+        .cart-count { position: absolute; top: -8px; right: -12px; background: var(--primary); color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px; min-width: 18px; text-align: center; }
+        
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: var(--white);
+            min-width: 220px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 12px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .dropdown-content a:hover {
+            background: var(--gray-bg);
+            color: var(--primary);
+        }
+        .dropdown-content hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid var(--gray-light);
+        }
+        
+        /* Category Navigation */
+        .category-nav {
+            background: var(--white);
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+            min-width: 1200px;
+        }
+        .category-menu {
+            width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            gap: 32px;
+        }
+        .category-link {
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .category-link:hover {
+            color: var(--primary);
+        }
+        
+        /* FIXED DESKTOP CHECKOUT CONTAINER */
+        .checkout-container { 
+            width: 1200px; 
+            margin: 40px auto; 
+            padding: 0;
+            display: grid; 
+            grid-template-columns: 1fr 380px; 
+            gap: 30px; 
+        }
+        .checkout-form { background: var(--white); border-radius: 16px; padding: 30px; }
+        .form-section { margin-bottom: 30px; }
+        .form-section h3 { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--gray-light); font-size: 18px; font-weight: 700; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid var(--gray-light); border-radius: 8px; font-size: 14px; font-family: inherit; transition: var(--transition); }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .payment-option { border: 1px solid var(--gray-light); border-radius: 10px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: var(--transition); }
+        .payment-option.selected { border-color: var(--primary); background: rgba(255,63,108,0.05); }
+        .payment-option label { display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 500; }
+        .coupon-section, .gift-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-light); }
+        .coupon-input-group { display: flex; gap: 10px; margin-top: 10px; }
+        .coupon-input-group input { flex: 1; padding: 12px; border: 1px solid var(--gray-light); border-radius: 8px; }
+        .apply-btn { padding: 12px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .remove-coupon { color: var(--primary); cursor: pointer; font-size: 12px; margin-top: 8px; display: inline-block; }
+        .coupon-applied { background: #e8f5e9; padding: 10px; border-radius: 8px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .order-summary { background: var(--white); border-radius: 16px; padding: 24px; height: fit-content; position: sticky; top: 20px; }
+        .order-summary h3 { margin-bottom: 20px; font-size: 18px; font-weight: 700; }
+        .order-item { display: flex; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-light); flex-wrap: nowrap; }
+        .order-item img { width: 60px; height: 75px; object-fit: cover; border-radius: 8px; }
+        .order-item-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .order-item-info p { font-size: 12px; color: var(--text-light); }
+        .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-light); flex-wrap: nowrap; }
+        .summary-total { display: flex; justify-content: space-between; padding: 16px 0; font-weight: 800; font-size: 18px; border-top: 2px solid var(--gray-light); margin-top: 12px; flex-wrap: nowrap; }
+        .place-order-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 24px; transition: var(--transition); }
+        .place-order-btn:hover { background: var(--primary-dark); }
+        
+        /* FOOTER - SAME AS INDEX.HTML (DESKTOP VIEW) */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            margin-top: 60px;
+            padding: 50px 0 30px;
+            min-width: 1200px;
+        }
+        .footer-container {
+            width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+        .footer-links-group h4 {
+            font-size: 14px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+        .footer-links-group ul {
+            list-style: none;
+        }
+        .footer-links-group ul li {
+            margin-bottom: 12px;
+        }
+        .footer-links-group ul li a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        .footer-links-group ul li a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #2a2a40;
+            color: #aaa;
+            font-size: 12px;
+        }
+        .footer-bottom strong {
+            color: var(--primary);
+        }
+        
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; color: white; padding: 14px 24px; border-radius: 12px; z-index: 2000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* NO RESPONSIVE BREAKPOINTS - SAME DESKTOP VIEW ON ALL DEVICES */
+    </style>
+</head>
+<body>
+    <div class="top-bar">🚚 FREE SHIPPING ON ₹1999+ • 15 DAYS EASY RETURNS • 100% SECURE PAYMENTS</div>
+
+    <div class="header">
+        <div class="header-container">
+            <div class="header-main">
+                <a href="splash.html" class="logo">
+                    <h1>EVERBUY</h1>
+                    <p>Your Everyday Store</p>
+                </a>
+                <div class="header-actions">
+                    <div class="dropdown">
+                        <div class="action-item" style="cursor: pointer;">
+                            <i class="far fa-user"></i>
+                            <span id="accountText">Account</span>
+                        </div>
+                        <div class="dropdown-content" id="accountDropdown">
+                            <a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                            <a href="orders.html"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="wishlist.html"><i class="far fa-heart"></i> Wishlist</a>
+                            <a href="cart.html"><i class="fas fa-bag-shopping"></i> Shopping Bag</a>
+                            <a href="addresses.html"><i class="fas fa-map-marker-alt"></i> Saved Addresses</a>
+                            <a href="payments.html"><i class="fas fa-credit-card"></i> Payment Methods</a>
+                            <hr>
+                            <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Login / Sign Up</a>
+                        </div>
+                    </div>
+                    <a href="wishlist.html" class="action-item">
+                        <i class="far fa-heart"></i>
+                        <span>Wishlist</span>
+                        <span id="wishlistCount" class="cart-count" style="display: none;">0</span>
+                    </a>
+                    <a href="cart.html" class="action-item">
+                        <i class="fas fa-bag-shopping"></i>
+                        <span>Bag</span>
+                        <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-nav">
+        <div class="category-menu">
+            <a href="products.html" class="category-link">ALL</a>
+            <a href="products.html?category=men" class="category-link">MEN</a>
+            <a href="products.html?category=women" class="category-link">WOMEN</a>
+            <a href="products.html?category=kids" class="category-link">KIDS</a>
+            <a href="products.html?category=ethnic" class="category-link">ETHNIC</a>
+            <a href="products.html?category=sports" class="category-link">SPORTS</a>
+            <a href="products.html?category=accessories" class="category-link">ACCESSORIES</a>
+            <a href="flash-sale.html" class="category-link" style="color: var(--primary);">SALE 🔥</a>
+            <a href="new-arrivals.html" class="category-link">NEW</a>
+            <a href="best-sellers.html" class="category-link">BESTSELLERS</a>
+        </div>
+    </div>
+
+    <div class="checkout-container">
+        <div class="checkout-form">
+            <h2 style="margin-bottom: 24px;">Checkout</h2>
+            <div class="form-section"><h3>Delivery Address</h3>
+                <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="fullName" placeholder="John Doe"></div><div class="form-group"><label>Phone Number</label><input type="tel" id="phone" placeholder="9876543210"></div></div>
+                <div class="form-group"><label>Address Line</label><input type="text" id="address" placeholder="House No., Building, Street"></div>
+                <div class="form-row"><div class="form-group"><label>City</label><input type="text" id="city" placeholder="City"></div><div class="form-group"><label>PIN Code</label><input type="text" id="pincode" placeholder="PIN Code"></div></div>
+            </div>
+            <div class="form-section"><h3>Payment Method</h3>
+                <div class="payment-option selected" onclick="selectPayment('cod')"><label><input type="radio" name="payment" value="cod" checked> Cash on Delivery</label></div>
+                <div class="payment-option" onclick="selectPayment('card')"><label><input type="radio" name="payment" value="card"> Credit/Debit Card</label></div>
+                <div class="payment-option" onclick="selectPayment('upi')"><label><input type="radio" name="payment" value="upi"> UPI (Google Pay, PhonePe)</label></div>
+            </div>
+        </div>
+        <div class="order-summary" id="orderSummary"></div>
+    </div>
+
+    <!-- FOOTER - SAME AS INDEX.HTML -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-links-group">
+                    <h4>SHOP</h4>
+                    <ul>
+                        <li><a href="products.html">All Products</a></li>
+                        <li><a href="new-arrivals.html">New Arrivals</a></li>
+                        <li><a href="best-sellers.html">Best Sellers</a></li>
+                        <li><a href="flash-sale.html">Flash Sale</a></li>
+                        <li><a href="coupons.html">Coupons & Offers</a></li>
+                        <li><a href="size-guide.html">Size Guide</a></li>
+                        <li><a href="product-compare.html">Compare Products</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>ABOUT</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="returns.html">Return Policy</a></li>
+                        <li><a href="shipping.html">Shipping Info</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>OFFERS</h4>
+                    <ul>
+                        <li><a href="gift-cards.html">Gift Cards</a></li>
+                        <li><a href="refer-earn.html">Refer & Earn</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-group">
+                    <h4>CONTACT</h4>
+                    <ul>
+                        <li><a href="tel:+919876543210">📞 +91 98765 43210</a></li>
+                        <li><a href="mailto:care@everbuy.com">✉️ care@everbuy.com</a></li>
+                        <li><a href="contact.html">💬 24/7 Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 EVERBUY - A <strong>Unifonect Solutions</strong> Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const splashSeen = sessionStorage.getItem('splashSeen');
+            if (!splashSeen) { window.location.href = 'splash.html'; return; }
+            const user = localStorage.getItem('everbuy_user');
+            if (!user) { window.location.href = 'login.html'; return; }
+        })();
+
+        const coupons = {
+            'SAVE20': { type: 'percentage', value: 20, minOrder: 1000, description: '20% off' },
+            'SAVE50': { type: 'percentage', value: 50, minOrder: 2000, description: '50% off' },
+            'FREESHIP': { type: 'shipping', value: 0, description: 'Free Shipping' },
+            'WELCOME100': { type: 'fixed', value: 100, minOrder: 500, description: '₹100 off' }
+        };
+        let giftCards = JSON.parse(localStorage.getItem('everbuy_giftcards') || '[]');
+
+        function getCart() { return JSON.parse(localStorage.getItem('everbuy_cart') || '[]'); }
+        function getWishlist() { return JSON.parse(localStorage.getItem('everbuy_wishlist') || '[]'); }
+        
+        let selectedPayment = 'cod';
+        let appliedCoupon = null;
+        let appliedGiftCard = null;
+        let couponDiscount = 0;
+        let giftDiscount = 0;
+
+        function updateCartCount() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cartCount');
+            if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline-block' : 'none'; }
+        }
+        
+        function updateWishlistCount() {
+            const wishlist = getWishlist();
+            const count = wishlist.length;
+            const badge = document.getElementById('wishlistCount');
+            if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline-block' : 'none'; }
+        }
+        
+        function updateAccountDropdown() {
+            const user = localStorage.getItem('everbuy_user');
+            const accountText = document.getElementById('accountText');
+            const logoutLink = document.getElementById('logoutLink');
+            if (user) {
+                const userData = JSON.parse(user);
+                if (accountText) accountText.innerText = `Hi, ${userData.name.split(' ')[0]}`;
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    logoutLink.href = '#';
+                    logoutLink.onclick = function(e) {
+                        e.preventDefault();
+                        localStorage.removeItem('everbuy_user');
+                        window.location.href = 'index.html';
+                    };
+                }
+            } else {
+                if (accountText) accountText.innerText = 'Account';
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Login / Sign Up';
+                    logoutLink.href = 'login.html';
+                    logoutLink.onclick = null;
+                }
+            }
+        }
+
+        function selectPayment(method) { 
+            selectedPayment = method; 
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected')); 
+            event.currentTarget.classList.add('selected'); 
+        }
+        
+        function showToast(message) { 
+            const existing = document.querySelector('.toast'); 
+            if (existing) existing.remove(); 
+            const toast = document.createElement('div'); 
+            toast.className = 'toast'; 
+            toast.innerHTML = message; 
+            document.body.appendChild(toast); 
+            setTimeout(() => toast.remove(), 2500); 
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCode')?.value.trim().toUpperCase();
+            if (!code) { showToast('Please enter a coupon code'); return; }
+            const coupon = coupons[code];
+            if (!coupon) { showToast('Invalid coupon code'); return; }
+            let cart = getCart();
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            if (coupon.minOrder && subtotal < coupon.minOrder) { showToast(`Minimum order of ₹${coupon.minOrder} required`); return; }
+            if (coupon.type === 'percentage') { couponDiscount = (subtotal * coupon.value) / 100; }
+            else if (coupon.type === 'fixed') { couponDiscount = coupon.value; }
+            else if (coupon.type === 'shipping') { couponDiscount = 0; appliedCoupon = { code, type: 'shipping', description: coupon.description }; renderOrderSummary(); showToast(`Coupon applied: ${coupon.description}`); return; }
+            appliedCoupon = { code, discount: couponDiscount, description: coupon.description, type: coupon.type };
+            renderOrderSummary();
+            showToast(`Coupon applied: ${coupon.description} - ₹${couponDiscount} off`);
+        }
+
+        function applyGiftCard() {
+            const code = document.getElementById('giftCode')?.value.trim();
+            if (!code) { showToast('Please enter gift card code'); return; }
+            const giftCard = giftCards.find(g => g.code === code && !g.used);
+            if (!giftCard) { showToast('Invalid or already used gift card'); return; }
+            let cart = getCart();
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            let afterCoupon = subtotal - couponDiscount;
+            if (giftCard.amount > afterCoupon) { giftDiscount = afterCoupon; giftCard.remaining = giftCard.amount - afterCoupon; }
+            else { giftDiscount = giftCard.amount; giftCard.used = true; }
+            appliedGiftCard = { code, amount: giftDiscount };
+            giftCards = giftCards.map(g => g.code === code ? giftCard : g);
+            localStorage.setItem('everbuy_giftcards', JSON.stringify(giftCards));
+            renderOrderSummary();
+            showToast(`Gift card applied: ₹${giftDiscount} off`);
+        }
+
+        function removeCoupon() { appliedCoupon = null; couponDiscount = 0; renderOrderSummary(); showToast('Coupon removed'); }
+        function removeGiftCard() { appliedGiftCard = null; giftDiscount = 0; renderOrderSummary(); showToast('Gift card removed'); }
+
+        function renderOrderSummary() {
+            let cart = getCart();
+            if (cart.length === 0) { window.location.href = 'cart.html'; return; }
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            let shipping = subtotal > 1999 ? 0 : 199;
+            let couponDeduction = couponDiscount;
+            let giftDeduction = giftDiscount;
+            let total = subtotal + shipping - couponDeduction - giftDeduction;
+            if (total < 0) total = 0;
+            document.getElementById('orderSummary').innerHTML = `
+                <h3>Order Summary</h3>
+                ${cart.map(item => `<div class="order-item"><img src="${item.image}" alt="${item.name}"><div class="order-item-info"><h4>${item.name}</h4><p>Qty: ${item.quantity} ${item.size ? `| Size: ${item.size}` : ''}</p><p style="font-weight: 600;">₹${item.price * item.quantity}</p></div></div>`).join('')}
+                <div class="coupon-section"><div style="font-weight: 600; font-size: 14px;">🎟️ Apply Coupon</div><div class="coupon-input-group"><input type="text" id="couponCode" placeholder="Enter coupon code (SAVE20, SAVE50, FREESHIP, WELCOME100)"><button class="apply-btn" onclick="applyCoupon()">Apply</button></div>${appliedCoupon ? `<div class="coupon-applied"><span>✓ Coupon applied: ${appliedCoupon.description}</span><span class="remove-coupon" onclick="removeCoupon()">Remove</span></div>` : ''}</div>
+                <div class="gift-section"><div style="font-weight: 600; font-size: 14px;">🎁 Gift Card</div><div class="coupon-input-group"><input type="text" id="giftCode" placeholder="Enter gift card code"><button class="apply-btn" onclick="applyGiftCard()">Apply</button></div>${appliedGiftCard ? `<div class="coupon-applied"><span>✓ Gift card applied: ₹${appliedGiftCard.amount} off</span><span class="remove-coupon" onclick="removeGiftCard()">Remove</span></div>` : ''}</div>
+                <div class="summary-row"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                <div class="summary-row"><span>Shipping</span><span>${shipping === 0 ? 'FREE' : '₹'+shipping}</span></div>
+                ${couponDeduction > 0 ? `<div class="summary-row"><span>Coupon Discount</span><span>-₹${couponDeduction}</span></div>` : ''}
+                ${giftDeduction > 0 ? `<div class="summary-row"><span>Gift Card</span><span>-₹${giftDeduction}</span></div>` : ''}
+                <div class="summary-total"><span>Total Amount</span><span>₹${total}</span></div>
+                <button class="place-order-btn" onclick="placeOrder(${total})">Place Order →</button>
+            `;
+        }
+        
+        function placeOrder(total) {
+            let name = document.getElementById('fullName')?.value;
+            let phone = document.getElementById('phone')?.value;
+            let address = document.getElementById('address')?.value;
+            let city = document.getElementById('city')?.value;
+            if (!name || !phone || !address || !city) { showToast('Please fill all delivery details'); return; }
+            let cart = getCart();
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            let shipping = subtotal > 1999 ? 0 : 199;
+            let order = { id: 'ORD' + Date.now(), date: new Date().toLocaleDateString(), items: cart, subtotal: subtotal, shipping: shipping, couponDiscount: couponDiscount, giftDiscount: giftDiscount, total: total, address: `${name}, ${address}, ${city}`, payment: selectedPayment, status: 'Confirmed', coupon: appliedCoupon, giftCard: appliedGiftCard };
+            let orders = JSON.parse(localStorage.getItem('everbuy_orders') || '[]');
+            orders.unshift(order);
+            localStorage.setItem('everbuy_orders', JSON.stringify(orders));
+            localStorage.setItem('everbuy_cart', '[]');
+            showToast('✅ Order placed successfully!');
+            setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+        }
+        
+        renderOrderSummary();
+        updateCartCount();
+        updateWishlistCount();
+        updateAccountDropdown();
+    </script>
+</body>
+</html>

@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Sale Control - Everbuy Admin</title>
+    <script>
+        (function() {
+            const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            if (!adminLoggedIn) {
+                window.location.href = 'admin-login.html';
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e62e5c;
+            --primary-light: #ff6b8a;
+            --dark: #1a1a2e;
+            --dark-light: #2a2a40;
+            --gray-bg: #f5f5f9;
+            --gray-light: #e8e8ec;
+            --text: #282c3f;
+            --text-light: #7e808c;
+            --white: #ffffff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-bg);
+            color: var(--text);
+        }
+
+        /* Admin Header */
+        .admin-header {
+            background: var(--dark);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-logo {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-logo span {
+            color: var(--primary);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+        }
+
+        /* Admin Container */
+        .admin-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            background: var(--white);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(255, 63, 108, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar-menu li a i {
+            width: 20px;
+            font-size: 16px;
+        }
+
+        /* Admin Content */
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: 25px;
+        }
+
+        .content-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .content-header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Flash Sale Banner */
+        .flash-banner {
+            background: linear-gradient(135deg, #ff3f6c, #ff6b8a);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flash-banner::before {
+            content: '🔥';
+            position: absolute;
+            font-size: 150px;
+            bottom: -30px;
+            right: -30px;
+            opacity: 0.15;
+        }
+
+        .flash-banner h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .flash-banner p {
+            opacity: 0.95;
+            font-size: 14px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .stat-icon i {
+            font-size: 48px;
+            color: var(--gray-light);
+        }
+
+        /* Status Card */
+        .status-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Timer Display */
+        .timer-display {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-label {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .timer-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .timer-unit {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .timer-number {
+            font-size: 42px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        .timer-label-sm {
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 63, 108, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Buttons */
+        .btn-start {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-start:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-stop {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .btn-stop:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Products Card */
+        .products-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .products-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .products-table {
+            overflow-x: auto;
+        }
+
+        .products-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .products-table th {
+            background: var(--gray-bg);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .product-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .product-img {
+            width: 50px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .flash-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .select-all-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .select-all-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .update-products-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .update-products-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .sidebar-menu li {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 15px 20px;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .btn-start,
+            .btn-stop {
+                width: 100%;
+                justify-content: center;
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+
+            .timer-number {
+                font-size: 28px;
+                padding: 10px 15px;
+            }
+
+            .timer-unit {
+                min-width: 60px;
+            }
+
+            .flash-banner h2 {
+                font-size: 24px;
+            }
+
+            .select-all-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="admin-logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>EVERBUY</span> Admin
+        </div>
+        <div class="admin-user">
+            <div class="admin-avatar">A</div>
+            <span>Welcome, Admin</span>
+            <a href="admin-login.html" class="logout-btn" onclick="sessionStorage.removeItem('adminLoggedIn')">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="admin-products.html"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="admin-orders.html"><i class="fas fa-truck"></i> Orders</a></li>
+                <li><a href="admin-users.html"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin-coupons.html"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
+                <li><a href="admin-flashsale.html" class="active"><i class="fas fa-fire"></i> Flash Sale</a></li>
+                <li><a href="admin-giftcards.html"><i class="fas fa-gift"></i> Gift Cards</a></li>
+                <li><a href="admin-reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+                <li><a href="admin-reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </div>
+
+        <div class="admin-content">
+            <div class="content-header">
+                <h1><i class="fas fa-fire"></i> Flash Sale Control</h1>
+                <p>Create urgency and boost sales with time-limited discounts</p>
+            </div>
+
+            <!-- Flash Sale Banner -->
+            <div class="flash-banner">
+                <h2>🔥 Flash Sale Manager</h2>
+                <p>Launch limited-time offers to drive sales</p>
+            </div>
+
+            <!-- Status Card -->
+            <div class="status-card">
+                <div class="status-header">
+                    <div class="status-title">
+                        <i class="fas fa-chart-line"></i> Current Status
+                    </div>
+                    <div id="statusBadge"></div>
+                </div>
+                <div id="timerDisplay"></div>
+            </div>
+
+            <!-- Control Form -->
+            <div class="form-card">
+                <h3><i class="fas fa-sliders-h"></i> Flash Sale Controls</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sale Duration (Hours)</label>
+                        <input type="number" id="durationHours" min="1" max="168" value="24">
+                    </div>
+                    <div class="form-group">
+                        <label>Discount Percentage (%)</label>
+                        <input type="number" id="discountPercent" min="10" max="80" value="40">
+                    </div>
+                </div>
+                <div>
+                    <button class="btn-start" onclick="startFlashSale()">
+                        <i class="fas fa-play"></i> Start Flash Sale
+                    </button>
+                    <button class="btn-stop" onclick="stopFlashSale()">
+                        <i class="fas fa-stop"></i> Stop Flash Sale
+                    </button>
+                </div>
+            </div>
+
+            <!-- Products Selection -->
+            <div class="products-card">
+                <h3><i class="fas fa-tags"></i> Flash Sale Products</h3>
+                <div class="select-all-row">
+                    <label class="select-all-label">
+                        <input type="checkbox" id="selectAllProducts" onchange="toggleAllProducts(this)">
+                        Select All Products
+                    </label>
+                    <button class="update-products-btn" onclick="updateFlashProducts()">
+                        <i class="fas fa-save"></i> Update Flash Sale Products
+                    </button>
+                </div>
+                <div class="products-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Brand</th>
+                                <th>Regular Price</th>
+                                <th>Flash Price</th>
+                             </tr>
+                        </thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product Database
+        const allProducts = [
+            { id: 1, name: "Cotton Relaxed T-Shirt", brand: "H&M", price: 1299, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100" },
+            { id: 2, name: "Slim Fit Denim Jeans", brand: "Levi's", price: 2299, image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=100" },
+            { id: 3, name: "Floral Maxi Dress", brand: "Zara", price: 3499, image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=100" },
+            { id: 4, name: "Oversized Hoodie", brand: "Nike", price: 2999, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100" },
+            { id: 5, name: "Leather Biker Jacket", brand: "Zara", price: 7999, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=100" },
+            { id: 6, name: "Linen Summer Shorts", brand: "Uniqlo", price: 999, image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=100" },
+            { id: 7, name: "Silk Blend Blouse", brand: "Mango", price: 2499, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=100" },
+            { id: 8, name: "Classic Oxford Shoes", brand: "Clarks", price: 3999, image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=100" }
+        ];
+
+        // Get flash sale products
+        function getFlashProducts() {
+            return JSON.parse(localStorage.getItem('flash_sale_products') || '[]');
+        }
+
+        function saveFlashProducts(products) {
+            localStorage.setItem('flash_sale_products', JSON.stringify(products));
+            renderProductsTable();
+        }
+
+        function isFlashActive() {
+            const endTime = localStorage.getItem('flash_sale_end');
+            if (!endTime) return false;
+            return new Date().getTime() < parseInt(endTime);
+        }
+
+        function getRemainingTime() {
+            const endTime = localStorage.getItem('flash_sale_end');
+            if (!endTime) return null;
+            const remaining = parseInt(endTime) - new Date().getTime();
+            if (remaining <= 0) return null;
+            return remaining;
+        }
+
+        function showToast(message, isError = false) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = message;
+            toast.style.background = isError ? '#dc3545' : '#1a1a1a';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function updateStatusDisplay() {
+            const isActive = isFlashActive();
+            const statusBadge = document.getElementById('statusBadge');
+            const timerDisplay = document.getElementById('timerDisplay');
+            
+            if (isActive) {
+                statusBadge.innerHTML = '<div class="status-badge status-active"><i class="fas fa-fire"></i> 🔥 ACTIVE</div>';
+                
+                const remaining = getRemainingTime();
+                if (remaining) {
+                    const hours = Math.floor(remaining / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (3600000)) / (1000 * 60));
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+                    
+                    timerDisplay.innerHTML = `
+                        <div class="timer-display">
+                            <div class="timer-label">ENDS IN</div>
+                            <div class="timer-boxes">
+                                <div class="timer-unit">
+                                    <div class="timer-number">${hours.toString().padStart(2, '0')}</div>
+                                    <div class="timer-label-sm">Hours</div>
+                                </div>
+                                <div class="timer-unit">
+                                    <div class="timer-number">${minutes.toString().padStart(2, '0')}</div>
+                                    <div class="timer-label-sm">Minutes</div>
+                                </div>
+                                <div class="timer-unit">
+                                    <div class="timer-number">${seconds.toString().padStart(2, '0')}</div>
+                                    <div class="timer-label-sm">Seconds</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                statusBadge.innerHTML = '<div class="status-badge status-inactive"><i class="fas fa-pause-circle"></i> ⚫ INACTIVE</div>';
+                timerDisplay.innerHTML = `
+                    <div class="timer-display">
+                        <div class="timer-label">No Active Flash Sale</div>
+                        <div class="timer-boxes">
+                            <div class="timer-unit">
+                                <div class="timer-number">00</div>
+                                <div class="timer-label-sm">Hours</div>
+                            </div>
+                            <div class="timer-unit">
+                                <div class="timer-number">00</div>
+                                <div class="timer-label-sm">Minutes</div>
+                            </div>
+                            <div class="timer-unit">
+                                <div class="timer-number">00</div>
+                                <div class="timer-label-sm">Seconds</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function startFlashSale() {
+            const hours = parseInt(document.getElementById('durationHours').value);
+            const discount = parseInt(document.getElementById('discountPercent').value);
+            const endTime = new Date().getTime() + (hours * 60 * 60 * 1000);
+            
+            localStorage.setItem('flash_sale_end', endTime);
+            localStorage.setItem('flash_sale_discount', discount);
+            
+            updateStatusDisplay();
+            showToast(`🔥 Flash sale started! Ends in ${hours} hours with ${discount}% off`);
+            
+            // Refresh timer every second
+            if (window.timerInterval) clearInterval(window.timerInterval);
+            window.timerInterval = setInterval(updateStatusDisplay, 1000);
+        }
+
+        function stopFlashSale() {
+            if (confirm('Are you sure you want to stop the flash sale?')) {
+                localStorage.removeItem('flash_sale_end');
+                localStorage.removeItem('flash_sale_discount');
+                updateStatusDisplay();
+                showToast('Flash sale stopped!');
+                if (window.timerInterval) clearInterval(window.timerInterval);
+            }
+        }
+
+        function renderProductsTable() {
+            const flashProducts = getFlashProducts();
+            const discount = parseInt(localStorage.getItem('flash_sale_discount') || 40);
+            const container = document.getElementById('productsTableBody');
+            
+            container.innerHTML = allProducts.map(product => {
+                const isInFlash = flashProducts.includes(product.id);
+                const flashPrice = Math.round(product.price * (1 - (discount / 100)));
+                
+                return `
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="product-checkbox" data-id="${product.id}" ${isInFlash ? 'checked' : ''}>
+                        </td>
+                        <td><img src="${product.image}" class="product-img" onerror="this.src='https://via.placeholder.com/50'"></td>
+                        <td><strong>${product.name}</strong></td>
+                        <td>${product.brand}</td>
+                        <td>₹${product.price}</td>
+                        <td class="flash-price">₹${flashPrice}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleAllProducts(selectAllCheckbox) {
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+        }
+
+        function updateFlashProducts() {
+            const selectedProducts = [];
+            document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
+                selectedProducts.push(parseInt(cb.dataset.id));
+            });
+            saveFlashProducts(selectedProducts);
+            showToast(`${selectedProducts.length} products added to flash sale!`);
+        }
+
+        // Initialize
+        renderProductsTable();
+        updateStatusDisplay();
+        
+        // Update timer every second
+        setInterval(updateStatusDisplay, 1000);
+    </script>
+</body>
+</html>

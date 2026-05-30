@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>About Us - Everbuy</title>
+    <script>
+        (function() {
+            const splashSeen = sessionStorage.getItem('splashSeen');
+            if (!splashSeen) {
+                const currentUrl = window.location.pathname.split('/').pop() || 'index.html';
+                localStorage.setItem('intendedUrl', currentUrl);
+                window.location.href = 'splash.html';
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== RESET & VARIABLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e62e5c;
+            --primary-light: #ff6b8a;
+            --dark: #0c0c0c;
+            --gray-bg: #f5f5f9;
+            --gray-light: #e8e8ec;
+            --text: #282c3f;
+            --text-light: #7e808c;
+            --white: #ffffff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-bg);
+            color: var(--text);
+            min-width: 1200px;
+            overflow-x: auto;
+        }
+
+        /* ========== TOP BAR ========== */
+        .top-bar {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 1200px;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            min-width: 1200px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .header-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2px;
+        }
+
+        .logo p {
+            font-size: 10px;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--gray-bg);
+            border-radius: 8px;
+            padding: 10px 16px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .search-box:focus-within {
+            background: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,63,108,0.1);
+        }
+
+        .search-box i {
+            color: var(--text-light);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 0 12px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .action-item:hover {
+            color: var(--primary);
+        }
+
+        .action-item i {
+            font-size: 22px;
+        }
+
+        .action-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: var(--white);
+            min-width: 220px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 12px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--gray-bg);
+            color: var(--primary);
+        }
+
+        .dropdown-content hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .category-nav {
+            background: var(--white);
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+            min-width: 1200px;
+        }
+
+        .category-menu {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 32px;
+        }
+
+        .category-link {
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-link:hover {
+            color: var(--primary);
+        }
+
+        /* ========== ABOUT PAGE CONTENT ========== */
+        .about-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .about-hero {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(255,63,108,0.08), rgba(255,107,138,0.08));
+            border-radius: 24px;
+        }
+
+        .about-hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .mission-vision {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .mission-box, .vision-box {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .mission-box:hover, .vision-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mission-box i, .vision-box i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .mission-box h2, .vision-box h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .mission-box p, .vision-box p {
+            color: var(--text-light);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .story-section {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 48px;
+            margin-bottom: 50px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .story-section h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .story-section p {
+            color: var(--text-light);
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto 20px;
+            font-size: 16px;
+        }
+
+        .why-choose-us {
+            margin-bottom: 50px;
+        }
+
+        .why-choose-us h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .values-section {
+            margin-bottom: 50px;
+        }
+
+        .values-section h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .value-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .value-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .value-card i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .value-card p {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 35px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .milestones-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 24px;
+            padding: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            color: white;
+        }
+
+        .milestones-section h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .milestones-section p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .milestones-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .milestone-item {
+            text-align: center;
+        }
+
+        .milestone-year {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .milestone-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .team-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .team-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .team-section > p {
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .team-card {
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-avatar {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+            color: white;
+        }
+
+        .team-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .team-role {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .team-bio {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .cta-section h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            margin-top: 60px;
+            padding: 50px 0 30px;
+            min-width: 1200px;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: #ff3f6c;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ff3f6c;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: #ff3f6c;
+            transform: translateY(-3px);
+        }
+
+        .contact-info p {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-info i {
+            width: 20px;
+            color: #ff3f6c;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #2a2a40;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .footer-bottom strong {
+            color: #ff3f6c;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .header-container, .about-container, .category-menu, .footer-container {
+                padding: 0 30px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .header-container, .about-container, .category-menu, .footer-container {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">🚚 FREE SHIPPING ON ORDERS ABOVE ₹1999 • 15 DAYS EASY RETURNS • 100% SECURE PAYMENTS</div>
+
+    <div class="header">
+        <div class="header-container">
+            <div class="header-main">
+                <a href="splash.html" class="logo">
+                    <h1>EVERBUY</h1>
+                    <p>Your Everyday Store</p>
+                </a>
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search for products, brands...">
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="dropdown">
+                        <div class="action-item" style="cursor: pointer;">
+                            <i class="far fa-user"></i>
+                            <span id="accountText">Account</span>
+                        </div>
+                        <div class="dropdown-content" id="accountDropdown">
+                            <a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                            <a href="orders.html"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="wishlist.html"><i class="far fa-heart"></i> Wishlist</a>
+                            <a href="cart.html"><i class="fas fa-bag-shopping"></i> Shopping Bag</a>
+                            <a href="addresses.html"><i class="fas fa-map-marker-alt"></i> Saved Addresses</a>
+                            <a href="payments.html"><i class="fas fa-credit-card"></i> Payment Methods</a>
+                            <a href="recently-viewed.html"><i class="fas fa-clock"></i> Recently Viewed</a>
+                            <hr>
+                            <a href="gift-cards.html"><i class="fas fa-gift"></i> Gift Cards</a>
+                            <a href="refer-earn.html"><i class="fas fa-users"></i> Refer & Earn</a>
+                            <hr>
+                            <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Login / Sign Up</a>
+                        </div>
+                    </div>
+                    <a href="wishlist.html" class="action-item">
+                        <i class="far fa-heart"></i>
+                        <span>Wishlist</span>
+                        <span id="wishlistCount" class="cart-count" style="display: none;">0</span>
+                    </a>
+                    <a href="cart.html" class="action-item">
+                        <i class="fas fa-bag-shopping"></i>
+                        <span>Bag</span>
+                        <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-nav">
+        <div class="category-menu">
+            <a href="products.html" class="category-link">ALL</a>
+            <a href="products.html?category=men" class="category-link">MEN</a>
+            <a href="products.html?category=women" class="category-link">WOMEN</a>
+            <a href="products.html?category=kids" class="category-link">KIDS</a>
+            <a href="products.html?category=ethnic" class="category-link">ETHNIC</a>
+            <a href="products.html?category=sports" class="category-link">SPORTS</a>
+            <a href="products.html?category=accessories" class="category-link">ACCESSORIES</a>
+            <a href="flash-sale.html" class="category-link" style="color: var(--primary);">SALE 🔥</a>
+            <a href="new-arrivals.html" class="category-link">NEW</a>
+            <a href="best-sellers.html" class="category-link">BESTSELLERS</a>
+        </div>
+    </div>
+
+    <!-- About Page Content -->
+    <div class="about-container">
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <h1>About Everbuy</h1>
+            <p>Your Everyday Store - By Unifonect Solutions</p>
+        </div>
+
+        <!-- Mission & Vision -->
+        <div class="mission-vision">
+            <div class="mission-box">
+                <i class="fas fa-bullseye"></i>
+                <h2>Our Mission</h2>
+                <p>To democratize fashion by making high-quality, trendy clothing accessible to everyone at affordable prices, while delivering exceptional customer experience.</p>
+            </div>
+            <div class="vision-box">
+                <i class="fas fa-eye"></i>
+                <h2>Our Vision</h2>
+                <p>To become India's most trusted and beloved fashion destination, empowering millions to express their unique style with confidence.</p>
+            </div>
+        </div>
+
+        <!-- Our Story -->
+        <div class="story-section">
+            <h2>📖 Our Story</h2>
+            <p>Everbuy is a proud initiative of <strong>Unifonect Solutions</strong>, launched with a simple yet powerful vision - fashion should be accessible to everyone, not just a privileged few. What started as a dream has now transformed into a vibrant community of fashion lovers across India.</p>
+            <p>Our journey is driven by our passion for fashion and our unwavering commitment to our customers. We carefully curate products from over 500+ brands to ensure that every style, every size, and every budget finds its perfect match.</p>
+            <p>As we embark on this exciting journey, our dedication to quality, sustainability, and customer satisfaction remains at the heart of everything we do. Join us as we write the next chapter of Indian fashion retail!</p>
+        </div>
+
+        <!-- Why Choose Us -->
+        <div class="why-choose-us">
+            <h2>✨ Why Choose Everbuy?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-tags"></i>
+                    <h3>Best Prices</h3>
+                    <p>Get the best deals with our competitive pricing and regular discounts. Price match guarantee.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-truck"></i>
+                    <h3>Fast Shipping</h3>
+                    <p>Free shipping on orders above ₹1999. Express delivery available in 1-2 business days.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>Easy Returns</h3>
+                    <p>15 days hassle-free returns. No questions asked return policy for your peace of mind.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>24/7 Support</h3>
+                    <p>Round-the-clock customer support. We're always here to help you.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Values -->
+        <div class="values-section">
+            <h2>💎 Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <i class="fas fa-heart"></i>
+                    <h3>Customer First</h3>
+                    <p>Our customers are at the heart of everything we do. We listen, we care, we deliver.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fas fa-leaf"></i>
+                    <h3>Sustainability</h3>
+                    <p>Committed to eco-friendly practices and sustainable fashion for a better tomorrow.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Quality & Trust</h3>
+                    <p>We never compromise on quality. Every product is carefully curated and tested.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Premium Brands</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Customer Support</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Secure Payments</div>
+            </div>
+        </div>
+
+        <!-- Future Milestones -->
+        <div class="milestones-section">
+            <h2>🚀 Our Roadmap</h2>
+            <p>Charting the future of fashion retail in India</p>
+            <div class="milestones-grid">
+                <div class="milestone-item">
+                    <div class="milestone-year">2026</div>
+                    <div class="milestone-text">Launch of Everbuy by Unifonect Solutions</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">2026-27</div>
+                    <div class="milestone-text">Expand to 500+ brands & 1000+ products</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">2027</div>
+                    <div class="milestone-text">Launch mobile app & express delivery</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">2027-28</div>
+                    <div class="milestone-text">Sustainable fashion initiative & pan-India presence</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-section">
+            <h2>👥 Meet Our Team</h2>
+            <p>The passionate people behind Everbuy</p>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">👩‍💼</div>
+                    <div class="team-name">Priya Sharma</div>
+                    <div class="team-role">CEO & Founder</div>
+                    <div class="team-bio">Visionary leader driving Everbuy's mission</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👨‍💻</div>
+                    <div class="team-name">Rahul Mehta</div>
+                    <div class="team-role">Chief Technology Officer</div>
+                    <div class="team-bio">Tech visionary driving digital innovation</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👩‍🎨</div>
+                    <div class="team-name">Anjali Verma</div>
+                    <div class="team-role">Head of Design</div>
+                    <div class="team-bio">Creative genius curating unique collections</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👨‍📦</div>
+                    <div class="team-name">Vikram Singh</div>
+                    <div class="team-role">Operations Director</div>
+                    <div class="team-bio">Ensuring seamless logistics & delivery</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h3>Join the Everbuy Family Today!</h3>
+            <p>Experience the joy of shopping with India's newest fashion destination</p>
+            <a href="products.html" class="cta-button">Start Shopping →</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>SHOP</h4>
+                    <ul>
+                        <li><a href="products.html">All Products</a></li>
+                        <li><a href="new-arrivals.html">New Arrivals</a></li>
+                        <li><a href="best-sellers.html">Best Sellers</a></li>
+                        <li><a href="flash-sale.html">Flash Sale</a></li>
+                        <li><a href="coupons.html">Coupons & Offers</a></li>
+                        <li><a href="size-guide.html">Size Guide</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>ABOUT</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="returns.html">Return Policy</a></li>
+                        <li><a href="shipping.html">Shipping Info</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CUSTOMER SERVICE</h4>
+                    <ul>
+                        <li><a href="order-tracking.html">Track Order</a></li>
+                        <li><a href="wishlist.html">My Wishlist</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="profile.html">My Profile</a></li>
+                        <li><a href="addresses.html">Saved Addresses</a></li>
+                        <li><a href="payments.html">Payment Methods</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CONNECT</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone-alt"></i> +91 98765 43210</p>
+                        <p><i class="fas fa-envelope"></i> care@everbuy.com</p>
+                        <p><i class="fas fa-clock"></i> 24/7 Support</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 EVERBUY - A <strong>Unifonect Solutions</strong> Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function checkLogin() {
+            const user = localStorage.getItem('everbuy_user');
+            if (!user) return false;
+            return JSON.parse(user);
+        }
+
+        function updateAccountDropdown() {
+            const user = localStorage.getItem('everbuy_user');
+            const accountText = document.getElementById('accountText');
+            const logoutLink = document.getElementById('logoutLink');
+            if (user) {
+                const userData = JSON.parse(user);
+                if (accountText) accountText.innerText = `Hi, ${userData.name.split(' ')[0]}`;
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    logoutLink.href = '#';
+                    logoutLink.onclick = function(e) {
+                        e.preventDefault();
+                        localStorage.removeItem('everbuy_user');
+                        window.location.href = 'index.html';
+                    };
+                }
+            } else {
+                if (accountText) accountText.innerText = 'Account';
+                if (logoutLink) {
+                    logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Login / Sign Up';
+                    logoutLink.href = 'login.html';
+                    logoutLink.onclick = null;
+                }
+            }
+        }
+
+        function getCart() { return JSON.parse(localStorage.getItem('everbuy_cart') || '[]'); }
+        function getWishlist() { return JSON.parse(localStorage.getItem('everbuy_wishlist') || '[]'); }
+        
+        function updateCartCount() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cartCount');
+            if (badge) badge.textContent = count;
+        }
+        
+        function updateWishlistCount() {
+            const wishlist = getWishlist();
+            const count = wishlist.length;
+            const badge = document.getElementById('wishlistCount');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const user = checkLogin();
+                if (user) window.location.href = `products.html?search=${encodeURIComponent(this.value)}`;
+                else window.location.href = 'login.html';
+            }
+        });
+        
+        updateCartCount();
+        updateWishlistCount();
+        updateAccountDropdown();
+    </script>
+</body>
+</html>
